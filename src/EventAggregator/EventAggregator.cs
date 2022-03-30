@@ -15,6 +15,10 @@ public class EventAggregator : IEventAggregator
 
     public void Publish<T>(object sender, T @event)
     {
-        
+        var handlers = _handlers[typeof(T)].Select(h => h as EventHandler<T>);
+        foreach (var handler in handlers)
+        {
+            handler.Invoke(sender, @event);
+        }
     }
 }
