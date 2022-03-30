@@ -6,4 +6,9 @@ public class EventAggregator : IEventAggregator
     {
         
     }
+
+    public void Publish<T>(T @event)
+    {
+        
+    }
 }
