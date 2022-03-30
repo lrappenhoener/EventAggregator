@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using FluentAssertions;
 using Xunit;
 
@@ -21,6 +22,25 @@ public abstract class Tests
         sut.Publish(expectedSender, expectedEvent);
 
         invoked.Should().BeTrue();
+    }
+    
+    [Fact]
+    public void Subscribed_Handlers_All_Invoked_When_Event_Published()
+    {
+        var sut = CreateSut();
+        var expectedEvent = new SampleEvent("TestMessage", 42);
+        var expectedSender = new object();
+        var invocations = new bool[3];
+        void Handler(object o, SampleEvent e) => invocations[0] = e == expectedEvent && o == expectedSender;
+        void Handler2(object o, SampleEvent e) => invocations[1] = e == expectedEvent && o == expectedSender;
+        void Handler3(object o, SampleEvent e) => invocations[2] = e == expectedEvent && o == expectedSender;
+        sut.Subscribe<SampleEvent>(Handler);
+        sut.Subscribe<SampleEvent>(Handler2);
+        sut.Subscribe<SampleEvent>(Handler3);
+
+        sut.Publish(expectedSender, expectedEvent);
+
+        invocations.All(invoked => invoked).Should().BeTrue();
     }
     
     [Fact]
