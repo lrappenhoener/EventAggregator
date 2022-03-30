@@ -38,4 +38,13 @@ public abstract class Tests
 
         invoked.Should().BeFalse();
     }
+    
+    [Fact]
+    public void Unsubscribed_Not_Subscribed_Handler_Not_Throws()
+    {
+        var sut = CreateSut();
+        void Handler(object o, SampleEvent e) { }
+
+        Record.Exception(() => sut.Unsubscribe<SampleEvent>(Handler)).Should().BeNull();
+    }
 }
