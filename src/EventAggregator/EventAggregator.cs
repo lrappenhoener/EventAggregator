@@ -24,6 +24,9 @@ public class EventAggregator : IEventAggregator
 
     public void Unsubscribe<T>(EventHandler<T> handler)
     {
+        var type = typeof(T);
+        if (!_handlers.ContainsKey(type))
+            return;
         _handlers[typeof(T)].Remove(handler);
     }
 }
