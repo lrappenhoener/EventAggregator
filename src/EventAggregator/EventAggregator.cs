@@ -7,7 +7,7 @@ public class EventAggregator : IEventAggregator
         
     }
 
-    public void Publish<T>(T @event)
+    public void Publish<T>(object sender, T @event)
     {
         
     }
