@@ -21,4 +21,9 @@ public class EventAggregator : IEventAggregator
             handler.Invoke(sender, @event);
         }
     }
+
+    public void Unsubscribe<T>(EventHandler<T> handler)
+    {
+        
+    }
 }
