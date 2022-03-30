@@ -22,4 +22,20 @@ public abstract class Tests
 
         invoked.Should().BeTrue();
     }
+    
+    [Fact]
+    public void Unsubscribed_Handler_Not_Invoked_When_Event_Published()
+    {
+        var sut = CreateSut();
+        var expectedEvent = new SampleEvent("TestMessage", 42);
+        var expectedSender = new object();
+        var invoked = false;
+        void Handler(object o, SampleEvent e) => invoked = e == expectedEvent && o == expectedSender;
+        sut.Subscribe<SampleEvent>(Handler);
+        sut.Unsubscribe<SampleEvent>(Handler);
+
+        sut.Publish(expectedSender, expectedEvent);
+
+        invoked.Should().BeFalse();
+    }
 }
