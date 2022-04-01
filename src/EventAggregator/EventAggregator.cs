@@ -8,14 +8,26 @@ public class EventAggregator : IEventAggregator
     public void Subscribe<T>(EventHandler<T> handler)
     {
         var type = typeof(T);
-        if (!_handlers.ContainsKey(type))
-            _handlers.Add(type, new List<object>());
-        _handlers[type].Add(handler);
+        Subscribe(type, handler);
+    }
+
+    public void Subscribe(Type eventType, object handler)
+    {
+        if (!_handlers.ContainsKey(eventType))
+            _handlers.Add(eventType, new List<object>());
+        _handlers[eventType].Add(handler);
     }
 
     public void Publish<T>(object sender, T @event)
     {
-        var handlers = _handlers[typeof(T)].Select(h => h as EventHandler<T>);
+        var handlers = _handlers[typeof(T)].Select(h =>
+        {
+            if (h is EventHandler<T> eventHandler)
+                return eventHandler;
+            if (h is Action<object, T> action)
+                return (o, e) => action(o, e);
+            return null;
+        });
         foreach (var handler in handlers)
         {
             handler?.Invoke(sender, @event);
@@ -25,8 +37,13 @@ public class EventAggregator : IEventAggregator
     public void Unsubscribe<T>(EventHandler<T> handler)
     {
         var type = typeof(T);
-        if (!_handlers.ContainsKey(type))
+        Unsubscribe(type, handler);
+    }
+
+    public void Unsubscribe(Type eventType, object handler)
+    {
+        if (!_handlers.ContainsKey(eventType))
             return;
-        _handlers[typeof(T)].Remove(handler);
+        _handlers[eventType].Remove(handler);
     }
 }
