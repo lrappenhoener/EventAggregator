@@ -20,6 +20,28 @@ public abstract class Tests
     }
     
     [Fact]
+    public void Subscribe_Of_T_Handler_Multiple_Times_Only_Invoked_Once_When_Event_Published()
+    {
+        var sut = CreateSut();
+        var expectedEvent = new SampleEvent("TestMessage", 42);
+        var expectedSender = new object();
+        var invoked = 0;
+        void Handler(object o, SampleEvent e)
+        {
+            if (e == expectedEvent && o == expectedSender)
+                invoked++;
+        }
+
+        sut.Subscribe<SampleEvent>(Handler);
+        sut.Subscribe<SampleEvent>(Handler);
+        sut.Subscribe<SampleEvent>(Handler);
+
+        sut.Publish(expectedSender, expectedEvent);
+
+        invoked.Should().Be(1);
+    }
+    
+    [Fact]
     public void Subscribe_Of_T_Handler_Invoked_When_Event_Published()
     {
         var sut = CreateSut();
