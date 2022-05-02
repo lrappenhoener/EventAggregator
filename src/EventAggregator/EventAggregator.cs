@@ -15,6 +15,7 @@ public class EventAggregator : IEventAggregator
     {
         if (!_handlers.ContainsKey(eventType))
             _handlers.Add(eventType, new List<object>());
+        if (_handlers[eventType].Contains(handler)) return;
         _handlers[eventType].Add(handler);
     }
 
