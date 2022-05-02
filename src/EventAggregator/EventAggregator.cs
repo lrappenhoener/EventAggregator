@@ -20,7 +20,9 @@ public class EventAggregator : IEventAggregator
 
     public void Publish<T>(object sender, T @event)
     {
-        var handlers = _handlers[typeof(T)].Select(h =>
+        var eventType = typeof(T);
+        if (!_handlers.ContainsKey(eventType)) return;
+        var handlers = _handlers[eventType].Select(h =>
         {
             if (h is EventHandler<T> eventHandler)
                 return eventHandler;
