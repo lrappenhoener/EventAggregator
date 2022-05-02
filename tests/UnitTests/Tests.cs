@@ -10,6 +10,16 @@ public abstract class Tests
     protected abstract IEventAggregator CreateSut();
 
     [Fact]
+    public void Publish_Event_With_No_Subscribed_Handlers_Does_Not_Throw()
+    {
+        var sut = CreateSut();
+
+        var exception = Record.Exception(() => sut.Publish(this, new SampleEvent("TestMessage", 42)));
+
+        exception.Should().BeNull();
+    }
+    
+    [Fact]
     public void Subscribe_Of_T_Handler_Invoked_When_Event_Published()
     {
         var sut = CreateSut();
