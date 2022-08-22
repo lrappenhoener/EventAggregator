@@ -3,7 +3,7 @@
 Decoupled event communication
 
 Example:
-´´´´
+```
 public class Program
 {
   public static void Main()
@@ -53,4 +53,4 @@ public class SampleEvent
     public string Message { get; }
 }
 
-´´´´
+```
