@@ -1,10 +1,12 @@
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using FluentAssertions;
 using Xunit;
 
 namespace EventAggregator.UnitTests;
 
+[SuppressMessage("ReSharper", "ConvertToLocalFunction")]
 public abstract class Tests
 {
     protected abstract IEventAggregator CreateSut();
@@ -27,7 +29,7 @@ public abstract class Tests
         var expectedSender = new object();
         var invoked = 0;
 
-        void Handler(object o, SampleEvent e)
+        void Handler(object? o, SampleEvent e)
         {
             if (e == expectedEvent && o == expectedSender)
                 invoked++;
@@ -50,7 +52,7 @@ public abstract class Tests
         var expectedSender = new object();
         var invoked = false;
 
-        void Handler(object o, SampleEvent e)
+        void Handler(object? o, SampleEvent e)
         {
             invoked = e == expectedEvent && o == expectedSender;
         }
@@ -70,12 +72,12 @@ public abstract class Tests
         var expectedSender = new object();
         var invoked = false;
 
-        void Handler(object o, SampleEvent e)
+        var handler = (object? o, SampleEvent e) =>
         {
             invoked = e == expectedEvent && o == expectedSender;
-        }
+        };
 
-        sut.Subscribe(typeof(SampleEvent), Handler);
+        sut.Subscribe(typeof(SampleEvent), handler);
 
         sut.Publish(expectedSender, expectedEvent);
 
@@ -90,17 +92,17 @@ public abstract class Tests
         var expectedSender = new object();
         var invocations = new bool[3];
 
-        void Handler(object o, SampleEvent e)
+        void Handler(object? o, SampleEvent e)
         {
             invocations[0] = e == expectedEvent && o == expectedSender;
         }
 
-        void Handler2(object o, SampleEvent e)
+        void Handler2(object? o, SampleEvent e)
         {
             invocations[1] = e == expectedEvent && o == expectedSender;
         }
 
-        void Handler3(object o, SampleEvent e)
+        void Handler3(object? o, SampleEvent e)
         {
             invocations[2] = e == expectedEvent && o == expectedSender;
         }
@@ -122,24 +124,24 @@ public abstract class Tests
         var expectedSender = new object();
         var invocations = new bool[3];
 
-        void Handler(object o, SampleEvent e)
+        var handler = (object? o, SampleEvent e) =>
         {
             invocations[0] = e == expectedEvent && o == expectedSender;
-        }
+        };
 
-        void Handler2(object o, SampleEvent e)
+        var handler2 = (object? o, SampleEvent e) =>
         {
             invocations[1] = e == expectedEvent && o == expectedSender;
-        }
+        };
 
-        void Handler3(object o, SampleEvent e)
+        var handler3 = (object? o, SampleEvent e) =>
         {
             invocations[2] = e == expectedEvent && o == expectedSender;
-        }
+        };
 
-        sut.Subscribe(typeof(SampleEvent), Handler);
-        sut.Subscribe(typeof(SampleEvent), Handler2);
-        sut.Subscribe(typeof(SampleEvent), Handler3);
+        sut.Subscribe(typeof(SampleEvent), handler);
+        sut.Subscribe(typeof(SampleEvent), handler2);
+        sut.Subscribe(typeof(SampleEvent), handler3);
 
         sut.Publish(expectedSender, expectedEvent);
 
@@ -154,13 +156,13 @@ public abstract class Tests
         var expectedSender = new object();
         var invoked = false;
 
-        void Handler(object o, SampleEvent e)
+        EventHandler<SampleEvent> handler = (o, e) =>
         {
             invoked = e == expectedEvent && o == expectedSender;
-        }
+        };
 
-        sut.Subscribe<SampleEvent>(Handler);
-        sut.Unsubscribe<SampleEvent>(Handler);
+        sut.Subscribe(handler);
+        sut.Unsubscribe(handler);
 
         sut.Publish(expectedSender, expectedEvent);
 
@@ -175,13 +177,13 @@ public abstract class Tests
         var expectedSender = new object();
         var invoked = false;
 
-        void Handler(object o, SampleEvent e)
+        var handler = (object o, SampleEvent e) =>
         {
             invoked = e == expectedEvent && o == expectedSender;
-        }
+        };
 
-        sut.Subscribe(typeof(SampleEvent), Handler);
-        sut.Unsubscribe(typeof(SampleEvent), Handler);
+        sut.Subscribe(typeof(SampleEvent), handler);
+        sut.Unsubscribe(typeof(SampleEvent), handler);
 
         sut.Publish(expectedSender, expectedEvent);
 
@@ -193,11 +195,11 @@ public abstract class Tests
     {
         var sut = CreateSut();
 
-        void Handler(object o, SampleEvent e)
+        EventHandler<SampleEvent> handler = (_, _) =>
         {
-        }
+        };
 
-        Record.Exception(() => sut.Unsubscribe<SampleEvent>(Handler)).Should().BeNull();
+        Record.Exception(() => sut.Unsubscribe(handler)).Should().BeNull();
     }
 
     [Fact]
@@ -205,10 +207,10 @@ public abstract class Tests
     {
         var sut = CreateSut();
 
-        void Handler(object o, SampleEvent e)
+        EventHandler<SampleEvent> handler = (_, _) =>
         {
-        }
+        };
 
-        Record.Exception(() => sut.Unsubscribe(typeof(SampleEvent), Handler)).Should().BeNull();
+        Record.Exception(() => sut.Unsubscribe(typeof(SampleEvent), handler)).Should().BeNull();
     }
 }
