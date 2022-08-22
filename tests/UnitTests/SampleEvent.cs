@@ -1,4 +1,4 @@
-namespace PCC.Libraries.EventAggregator.UnitTests;
+namespace EventAggregator.UnitTests;
 
 public class SampleEvent
 {
@@ -7,7 +7,7 @@ public class SampleEvent
         Time = time;
         Message = message;
     }
-    
-    public string Message { get; private set; } 
-    public int Time { get; private set; }
+
+    public string Message { get; }
+    public int Time { get; }
 }

@@ -1,9 +1,10 @@
-namespace PCC.Libraries.EventAggregator;
+namespace EventAggregator;
 
 public class EventAggregator : IEventAggregator
 {
-    private readonly Dictionary<Type, List<object>> _handlers =
-        new Dictionary<Type, List<object>>();
+    private readonly Dictionary<Type, List<object>> _handlers = new();
+
+    #region IEventAggregator Members
 
     public void Subscribe<T>(EventHandler<T> handler)
     {
@@ -31,10 +32,7 @@ public class EventAggregator : IEventAggregator
                 return (o, e) => action(o, e);
             return null;
         });
-        foreach (var handler in handlers)
-        {
-            handler?.Invoke(sender, @event);
-        }
+        foreach (var handler in handlers) handler?.Invoke(sender, @event);
     }
 
     public void Unsubscribe<T>(EventHandler<T> handler)
@@ -49,4 +47,6 @@ public class EventAggregator : IEventAggregator
             return;
         _handlers[eventType].Remove(handler);
     }
+
+    #endregion
 }

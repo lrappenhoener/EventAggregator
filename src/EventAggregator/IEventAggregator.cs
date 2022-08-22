@@ -1,4 +1,4 @@
-namespace PCC.Libraries.EventAggregator;
+namespace EventAggregator;
 
 public interface IEventAggregator
 {

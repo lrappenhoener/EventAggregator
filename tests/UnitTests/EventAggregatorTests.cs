@@ -1,4 +1,4 @@
-namespace PCC.Libraries.EventAggregator.UnitTests;
+namespace EventAggregator.UnitTests;
 
 public class EventAggregatorTests : Tests
 {
